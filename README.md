@@ -160,4 +160,4 @@ This uses nodemon for automatic server restart on file changes.
 
 ---
 
-**Built with ❤️ for professional cryptocurrency monitoring** 
+**Built with ❤️ for professional cryptocurrency monitoring**

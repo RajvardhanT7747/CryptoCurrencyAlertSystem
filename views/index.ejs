@@ -1,83 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cryptocurrency Prices</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoAlert Pro - Real-time Cryptocurrency Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="bg-animation"></div>
+    <div class="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-chart-line me-3"></i>CryptoAlert Pro</h1>
+            <p class="text-center text-secondary mb-0">Real-time Cryptocurrency Price Monitoring & Alerts</p>
+        </div>
+    </header>
+
     <div class="container my-5">
-      <h1 class="text-center mb-4">Cryptocurrency Prices</h1>
-
-      <!-- Display Alerts Section -->
-      <% if (alerts.length > 0) { %>
-      <div class="alert alert-warning" role="alert">
-        <h4 class="alert-heading">Alerts</h4>
-        <ul class="mb-0">
-          <% alerts.forEach(alert => { %>
-          <li><%= alert %></li>
-          <% }) %>
-        </ul>
-      </div>
-      <% } else { %>
-      <div class="alert alert-info text-center" role="alert">
-        No alerts at the moment.
-      </div>
-      <% } %>
-
-      <!-- Cryptocurrency Prices Table -->
-      <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white">
-          Cryptocurrency Prices
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number"><%= cryptos.length %></div>
+                    <div class="stats-label">Cryptocurrencies</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number"><%= alerts.length %></div>
+                    <div class="stats-label">Active Alerts</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalValue">$0</div>
+                    <div class="stats-label">Total Value</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="lastUpdate">Now</div>
+                    <div class="stats-label">Last Updated</div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-          <table class="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Symbol</th>
-                <th>Price (USD)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% cryptos.forEach(crypto => { %>
-              <tr>
-                <td><%= crypto.name %></td>
-                <td><%= crypto.symbol %></td>
-                <td>$<%= crypto.price.toFixed(2) %></td>
-                <td>
-                  <a
-                    href="/delete-crypto/<%= crypto.symbol %>"
-                    class="btn btn-danger btn-sm"
-                    onclick="return confirm('Are you sure you want to delete this cryptocurrency?');"
-                    >Delete</a
-                  >
-                </td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      <!-- Actions Section -->
-      <div class="text-center">
-        <form action="/update-prices" method="POST" class="d-inline">
-          <button type="submit" class="btn btn-success me-2">
-            Get Latest Prices
-          </button>
-        </form>
-        <a href="/set-alert" class="btn btn-warning me-2">Set an Alert</a>
-        <a href="/add-crypto" class="btn btn-primary">Add New Cryptocurrency</a>
-        <a href="/remove-alert" class="btn btn-danger">Delete an Alert</a>
-      </div>
+        <!-- Alerts Section -->
+        <% if (alerts.length > 0) { %>
+        <div class="alert alert-warning fade-in" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+                <div>
+                    <h4 class="alert-heading mb-2">Price Alerts</h4>
+                    <div class="row">
+                        <% alerts.forEach((alert, index) => { %>
+                        <div class="col-md-6 mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-bell text-warning me-2"></i>
+                                <span><%= alert %></span>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } else { %>
+        <div class="alert alert-info fade-in text-center" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            No price alerts at the moment. Set up alerts to get notified when prices drop below your threshold.
+        </div>
+        <% } %>
+
+        <!-- Search and Actions -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0">
+                        <i class="fas fa-search text-secondary"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search cryptocurrencies...">
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-success" onclick="updatePrices()">
+                        <i class="fas fa-sync-alt me-2"></i>Update Prices
+                    </button>
+                    <a href="/set-alert" class="btn btn-warning">
+                        <i class="fas fa-bell me-2"></i>Set Alert
+                    </a>
+                    <a href="/add-crypto" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Crypto
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cryptocurrency Prices Table -->
+        <div class="card fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-coins me-2"></i>Cryptocurrency Prices</h5>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success me-2">Live</span>
+                    <small class="text-light">Auto-refresh every 30s</small>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-coin me-2"></i>Name</th>
+                                <th><i class="fas fa-tag me-2"></i>Symbol</th>
+                                <th><i class="fas fa-dollar-sign me-2"></i>Price (USD)</th>
+                                <th><i class="fas fa-chart-line me-2"></i>24h Change</th>
+                                <th><i class="fas fa-cog me-2"></i>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% cryptos.forEach((crypto, index) => { %>
+                            <tr class="slide-up" data-animation-delay="<%= index * 0.05 %>s">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="crypto-icon me-3">
+                                            <i class="fas fa-bitcoin text-warning"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold"><%= crypto.name %></div>
+                                            <small class="text-secondary">#<%= index + 1 %></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="crypto-symbol"><%= crypto.symbol %></span>
+                                </td>
+                                <td>
+                                    <div class="price" data-price="<%= crypto.price %>">
+                                        $<%= crypto.price.toFixed(2) %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="price-change price-up">
+                                        <i class="fas fa-arrow-up me-1"></i>+2.5%
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-primary" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <a href="/delete-crypto/<%= crypto.symbol %>" 
+                                           class="btn btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to delete <%= crypto.name %>?')"
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Quick Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/set-alert" class="btn btn-warning">
+                                <i class="fas fa-bell me-2"></i>Set Price Alert
+                            </a>
+                            <a href="/add-crypto" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Add New Cryptocurrency
+                            </a>
+                            <a href="/remove-alert" class="btn btn-outline-danger">
+                                <i class="fas fa-trash me-2"></i>Manage Alerts
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-chart-area me-2"></i>Market Overview</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="priceChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5">
+        <div class="container">
+            <p class="text-secondary mb-0">
+                <i class="fas fa-shield-alt me-2"></i>
+                CryptoAlert Pro - Professional Cryptocurrency Monitoring Platform
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <script>
+        // Calculate total value
+        function calculateTotalValue() {
+            const prices = document.querySelectorAll('[data-price]');
+            let total = 0;
+            prices.forEach(price => {
+                total += parseFloat(price.dataset.price);
+            });
+            document.getElementById('totalValue').textContent = '$' + total.toLocaleString();
+        }
+
+        // Update last update time
+        function updateLastUpdate() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+        }
+
+        // Update prices function
+        async function updatePrices() {
+            try {
+                const response = await fetch('/update-prices', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Error updating prices:', error);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateTotalValue();
+            updateLastUpdate();
+            
+            // Update time every minute
+            setInterval(updateLastUpdate, 60000);
+        });
+    </script>
+</body>
 </html>
